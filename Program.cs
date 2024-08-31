@@ -1,3 +1,5 @@
+using Gmap.Controllers;
+
 namespace Gmap
 {
     internal static class Program
@@ -10,8 +12,13 @@ namespace Gmap
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
-            Application.Run(new Main());
+            /*ApplicationConfiguration.Initialize();
+            Application.Run(new Main());*/
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Main mainForm = new Main();
+            MainController controller = new MainController(mainForm.GMapControl);
+            Application.Run(mainForm);
         }
     }
 }

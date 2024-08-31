@@ -1,5 +1,8 @@
-﻿using GMap.NET;
+﻿using Gmap.Controllers;
+using Gmap.Models;
+using GMap.NET;
 using GMap.NET.WindowsForms;
+using GMap.NET.WindowsForms.Markers;
 using System;
 namespace Gmap
 {
@@ -10,6 +13,12 @@ namespace Gmap
         public Main()
         {
             InitializeComponent();
+            InitializeMap();
+        }
+        private MainController _mainController;
+        public GMap.NET.WindowsForms.GMapControl GMapControl { get; private set; }
+        private void InitializeMap()
+        {
             gMap = new GMap.NET.WindowsForms.GMapControl();
             gMap.MapProvider = GMap.NET.MapProviders.GMapProviders.GoogleMap;
             gMap.Dock = DockStyle.Fill;
@@ -18,10 +27,14 @@ namespace Gmap
             gMap.ShowCenter = false;
             gMap.MinZoom = 1;
             gMap.MaxZoom = 20;
-            gMap.Position = new PointLatLng(21.5, 105.8);
             gMap.Zoom = 9;
+            gMap.SetPositionByKeywords("Hanoi, Vietnam");
             gMap.OnMapZoomChanged += new MapZoomChanged(onMapZoomChanged);
             splitContainerControl.Panel2.Controls.Add(gMap);
+
+            CityRepository geoJsonReader = new CityRepository();
+            _mainController = new MainController(gMap);
+            _mainController.LoadGeoJsonAndDraw();
         }
 
         private void btnGoto_Click(object sender, EventArgs e)
