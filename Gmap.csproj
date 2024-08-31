@@ -13,4 +13,8 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="GMap.NET.Winforms" Version="2.1.7" />
+  </ItemGroup>
+
 </Project>
