@@ -1,5 +1,5 @@
 using Gmap.Controllers;
-
+using Gmap.Models;
 namespace Gmap
 {
     internal static class Program
@@ -17,7 +17,7 @@ namespace Gmap
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Main mainForm = new Main();
-            MainController controller = new MainController(mainForm.GMapControl);
+            MainController controller = new MainController(mainForm.gMap);
             Application.Run(mainForm);
         }
     }

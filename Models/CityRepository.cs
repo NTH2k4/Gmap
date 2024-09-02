@@ -8,7 +8,7 @@ namespace Gmap.Models
 {
     internal class CityRepository
     {
-        public GeoJson ReadGeoJson()
+        public GeoJson ReadCity()
         {
             string filePath = @"D:\Project VS\Gmap\Models\gadm41_VNM_1.json";
             string geoJsonContent = File.ReadAllText(filePath);

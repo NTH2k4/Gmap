@@ -8,7 +8,7 @@ namespace Gmap
 {
     public partial class Main : Form
     {
-        GMap.NET.WindowsForms.GMapControl gMap;
+        public GMap.NET.WindowsForms.GMapControl gMap { get; private set; }
 
         public Main()
         {
@@ -16,13 +16,12 @@ namespace Gmap
             InitializeMap();
         }
         private MainController _mainController;
-        public GMap.NET.WindowsForms.GMapControl GMapControl { get; private set; }
         private void InitializeMap()
         {
             gMap = new GMap.NET.WindowsForms.GMapControl();
-            gMap.MapProvider = GMap.NET.MapProviders.GMapProviders.GoogleMap;
+            gMap.MapProvider = GMap.NET.MapProviders.GMapProviders.BingMap;
             gMap.Dock = DockStyle.Fill;
-            gMap.MapProvider = GMap.NET.MapProviders.BingMapProvider.Instance;
+            /*gMap.MapProvider = GMap.NET.MapProviders.BingMapProvider.Instance;*/
             GMap.NET.GMaps.Instance.Mode = GMap.NET.AccessMode.ServerAndCache;
             gMap.ShowCenter = false;
             gMap.MinZoom = 1;
@@ -32,9 +31,12 @@ namespace Gmap
             gMap.OnMapZoomChanged += new MapZoomChanged(onMapZoomChanged);
             splitContainerControl.Panel2.Controls.Add(gMap);
 
-            CityRepository geoJsonReader = new CityRepository();
             _mainController = new MainController(gMap);
-            _mainController.LoadGeoJsonAndDraw();
+            CityRepository geoJsonReader = new CityRepository();
+            _mainController.LoadGeoJsonCity();
+
+            RoadRepository geoRepository = new RoadRepository();
+            _mainController.LoadGeoJsonRoad();
         }
 
         private void btnGoto_Click(object sender, EventArgs e)
@@ -54,7 +56,17 @@ namespace Gmap
 
         private void btnActiveDrag_Click(object sender, EventArgs e)
         {
-            gMap.DragButton = MouseButtons.Left;
+            if (btnActiveDrag.Text == "Active Drag")
+            {
+                gMap.CanDragMap = true;
+                gMap.DragButton = MouseButtons.Left;
+                btnActiveDrag.Text = "Deactive Drag";
+            }
+            else
+            {
+                gMap.CanDragMap = false;
+                btnActiveDrag.Text = "Active Drag";
+            }
         }
 
         private void btnActiveMouseClick_Click(object sender, EventArgs e)
