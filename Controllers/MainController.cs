@@ -2,9 +2,6 @@
 using GMap.NET;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
-using System.Collections.Generic;
-using System.Drawing;
-using static Gmap.Models.City;
 
 namespace Gmap.Controllers
 {
@@ -21,10 +18,10 @@ namespace Gmap.Controllers
             _roadReader = new RoadRepository();
         }
 
-        public void LoadGeoJsonCity()
+        /*public void LoadGeoJsonCity()
         {
             City.GeoJson geoJson = _cityReader.ReadCity();
-
+            
             foreach (var feature in geoJson.features)
             {
                 GMapOverlay overlay = new GMapOverlay("polygons");
@@ -45,6 +42,43 @@ namespace Gmap.Controllers
                             Stroke = new Pen(Color.Red, 1),
                             Fill = new SolidBrush(Color.FromArgb(50, Color.Red))
                         };
+                        overlay.Polygons.Add(polygon);
+                    }
+                }
+                _mainControl.Overlays.Add(overlay);
+            }
+            _mainControl.ZoomAndCenterMarkers("polygons");
+        }*/
+
+        public void LoadGeoJsonCity()
+        {
+            City.GeoJson geoJson = _cityReader.ReadCity();
+
+            foreach (var feature in geoJson.features)
+            {
+                GMapOverlay overlay = new GMapOverlay("polygons");
+                foreach (var polygonCoordinates in feature.geometry.coordinates)
+                {
+                    foreach (var ringCoordinates in polygonCoordinates)
+                    {
+                        List<PointLatLng> points = new List<PointLatLng>();
+                        double lat = 0, lng = 0;
+                        int count = 0;
+                        foreach (var coordinate in ringCoordinates)
+                        {
+                            double x = coordinate[1];
+                            double y = coordinate[0];
+                            lat += x;
+                            lng += y;
+                            count++;
+                            points.Add(new PointLatLng(x, y));
+                        }
+
+                        GMapPolygon polygon = new GMapPolygon(points, feature.properties.NAME_1)
+                        {
+                            Stroke = new Pen(Color.Red, 1),
+                            Fill = new SolidBrush(Color.FromArgb(50, Color.Red))
+                        };
 
                         overlay.Polygons.Add(polygon);
                     }
@@ -52,36 +86,45 @@ namespace Gmap.Controllers
                 _mainControl.Overlays.Add(overlay);
             }
             _mainControl.ZoomAndCenterMarkers("polygons");
+
+            // Thêm sự kiện MouseDown vào GMapControl
+            _mainControl.MouseDown += new MouseEventHandler(MainControl_MouseDown);
         }
 
-
-        /*public void LoadGeoJsonRoad()
+        // Xử lý sự kiện MouseDown
+        private void MainControl_MouseDown(object sender, MouseEventArgs e)
         {
-            Road.GeoJson geoJson = _roadReader.ReadRoad();
-
-            foreach (var feature in geoJson.features)
+            if (e.Button == MouseButtons.Right)
             {
-                GMapOverlay overlay = new GMapOverlay("routes");
-                foreach (var routeCoordinates in feature.geometry.coordinates)
+                PointLatLng point = _mainControl.FromLocalToLatLng(e.X, e.Y);
+
+                foreach (var overlay in _mainControl.Overlays)
                 {
-                    List<PointLatLng> points = new List<PointLatLng>();
-                    foreach (var coordinate in routeCoordinates)
+                    foreach (var polygon in overlay.Polygons)
                     {
-                        double x = coordinate[1];
-                        double y = coordinate[0];
-                        points.Add(new PointLatLng(x, y));
+                        if (polygon.IsInside(point))
+                        {
+                            // Tạo chuỗi chứa các thông tin bổ sung
+                            var feature = _cityReader.ReadCity().features.FirstOrDefault(f => f.properties.NAME_1 == polygon.Name);
+                            if (feature != null)
+                            {
+                                string info = $"Tên: {feature.properties.NAME_1}\n" +
+                                              $"GID_1: {feature.properties.GID_1}\n" +
+                                              $"GID_0: {feature.properties.GID_0}\n" +
+                                              $"Quốc gia: {feature.properties.COUNTRY}\n" +
+                                              $"Tên khác: {feature.properties.VARNAME_1}\n" +
+                                              $"Loại: {feature.properties.TYPE_1}\n" +
+                                              $"Loại (tiếng Anh): {feature.properties.ENGTYPE_1}\n" +
+                                              $"Mã ISO: {feature.properties.ISO_1}";
+
+                                MessageBox.Show(info, "Thông tin thành phố", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                            break;
+                        }
                     }
-
-                    GMapRoute route = new GMapRoute(points, feature.properties.name)
-                    {
-                        Stroke = new Pen(Color.Blue, 2)
-                    };
-
-                    overlay.Routes.Add(route);
                 }
             }
-            _mainControl.ZoomAndCenterRoutes("routes");
-        }*/
+        }
 
         public void LoadGeoJsonRoad()
         {
