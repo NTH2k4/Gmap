@@ -7,7 +7,7 @@ namespace Gmap.Models
 {
     internal class City
     {
-        // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+        // GeoJson myDeserializedClass = JsonConvert.DeserializeObject<GeoJson>(myJsonResponse);
         public class Crs
         {
             public string type { get; set; }
